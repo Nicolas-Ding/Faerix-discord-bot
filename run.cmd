@@ -1,0 +1,1 @@
+﻿dotnet BJR-bot.dll %*
