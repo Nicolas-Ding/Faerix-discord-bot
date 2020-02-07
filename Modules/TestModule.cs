@@ -16,7 +16,10 @@ namespace BJR_bot.Modules
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
         {
-            user ??= Context.User;
+            if (user == null)
+            {
+                user = Context.User;
+            }
 
             await ReplyAsync(user.ToString());
         }

@@ -26,7 +26,7 @@ namespace BJR_bot
         {
             var token = await GetTokenAsync();
 
-            using var services = ConfigureServices();
+            var services = ConfigureServices();
             _client = services.GetRequiredService<DiscordSocketClient>();
 
             _client.Log += LogAsync;
@@ -42,6 +42,7 @@ namespace BJR_bot
 
             // Block the program until it is closed.
             await Task.Delay(-1);
+            services.Dispose();
         }
 
         private async Task<string> GetTokenAsync()
