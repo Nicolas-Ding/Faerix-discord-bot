@@ -8,43 +8,38 @@ namespace BJR_bot.Services
 {
     public class LolService
     {
-        private Dictionary<string, IList<(DateTimeOffset, IUser)>> usersLookingForGame; 
+        private Dictionary<string, Dictionary<IUser, DateTimeOffset>> usersLookingForGame; 
  
         public LolService()
         {
-            usersLookingForGame = new Dictionary<string, IList<(DateTimeOffset, IUser)>>();
+            usersLookingForGame = new Dictionary<string, Dictionary<IUser, DateTimeOffset>>();
         }
 
-        public IList<(DateTimeOffset, IUser)> GetUsers(string game)
+        public Dictionary<IUser, DateTimeOffset> GetUsers(string game)
         {
             CleanList();
-            return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new List<(DateTimeOffset, IUser)>();
+            return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new Dictionary<IUser, DateTimeOffset>();
         }
 
         public void AddUser(string game, IUser user)
         {
             if (!usersLookingForGame.ContainsKey(game))
             {
-                usersLookingForGame[game] = new List<(DateTimeOffset, IUser)>();
+                usersLookingForGame[game] = new Dictionary<IUser, DateTimeOffset>();
             }
 
-            if (usersLookingForGame[game].All(_ => _.Item2.Id != user.Id))
-            {
-                usersLookingForGame[game].Add((DateTimeOffset.UtcNow.Add(TimeSpan.FromHours(1)), user));
-            }
+            usersLookingForGame[game][user] = DateTimeOffset.UtcNow.Add(TimeSpan.FromHours(1));
         }
 
         public void RemoveUser(string game, IUser user)
         {
-            usersLookingForGame[game] = usersLookingForGame[game]
-                .Where(_ => _.Item2.Id != user.Id)
-                .ToList();
+            usersLookingForGame[game].Remove(user);
         }
 
 
         public void RemoveUser(IUser user)
         {
-            List<string> keys = new List<string>(usersLookingForGame.Keys);
+            var keys = new List<string>(usersLookingForGame.Keys);
 
             foreach (string game in keys)
             {
@@ -54,13 +49,13 @@ namespace BJR_bot.Services
 
         public void CleanList()
         {
-            List<string> keys = new List<string>(usersLookingForGame.Keys);
+            var keys = new List<string>(usersLookingForGame.Keys);
 
             foreach (string game in keys)
             {
                 usersLookingForGame[game] = usersLookingForGame[game]
-                    .Where(_ => _.Item1 > DateTimeOffset.UtcNow)
-                    .ToList();
+                    .Where(_ => _.Value > DateTimeOffset.UtcNow)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value);
             }
         }
     }

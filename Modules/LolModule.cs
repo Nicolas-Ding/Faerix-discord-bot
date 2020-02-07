@@ -45,7 +45,7 @@ namespace BJR_bot.Modules
         [Command("list")]
         public async Task ListAsync(string game)
         {
-            IList<(DateTimeOffset, IUser)> dispoUsers = _lolService.GetUsers(game);
+           Dictionary<IUser, DateTimeOffset> dispoUsers = _lolService.GetUsers(game);
             EmbedBuilder embed;
             if (dispoUsers.Count == 0)
             {
@@ -65,8 +65,8 @@ namespace BJR_bot.Modules
                 var message = new StringBuilder();
                 foreach (var dispoUser in dispoUsers)
                 {
-                    embed.AddField(dispoUser.Item2.Username,
-                        $"Encore {(int) (dispoUser.Item1 - DateTimeOffset.UtcNow).TotalMinutes} min");
+                    embed.AddField(dispoUser.Key.Username,
+                        $"Encore {(int) (dispoUser.Value - DateTimeOffset.UtcNow).TotalMinutes} min");
                 }
             }
 
@@ -77,11 +77,11 @@ namespace BJR_bot.Modules
         public async Task PingAsync(string game)
         {
             _lolService.AddUser(game, Context.User);
-            IList<(DateTimeOffset, IUser)> dispoUsers = _lolService.GetUsers(game);
+            Dictionary<IUser, DateTimeOffset> dispoUsers = _lolService.GetUsers(game);
             StringBuilder message = new StringBuilder($"Ping pour jouer à **{game}**\n");
             foreach (var dispoUser in dispoUsers)
             {
-                message.Append($"{dispoUser.Item2.Mention}\tEncore {(int)(dispoUser.Item1 - DateTimeOffset.UtcNow).TotalMinutes}min");
+                message.Append($"{dispoUser.Key.Mention}\tEncore {(int)(dispoUser.Value - DateTimeOffset.UtcNow).TotalMinutes}min\n");
             }
             await ReplyAsync(message.ToString());
         }
