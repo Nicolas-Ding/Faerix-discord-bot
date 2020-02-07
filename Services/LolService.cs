@@ -21,14 +21,14 @@ namespace BJR_bot.Services
             return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new Dictionary<IUser, DateTimeOffset>();
         }
 
-        public void AddUser(string game, IUser user)
+        public void AddUser(string game, IUser user, TimeSpan availableTime)
         {
             if (!usersLookingForGame.ContainsKey(game))
             {
                 usersLookingForGame[game] = new Dictionary<IUser, DateTimeOffset>();
             }
 
-            usersLookingForGame[game][user] = DateTimeOffset.UtcNow.Add(TimeSpan.FromHours(1));
+            usersLookingForGame[game][user] = DateTimeOffset.UtcNow.Add(availableTime);
         }
 
         public void RemoveUser(string game, IUser user)

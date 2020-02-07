@@ -18,12 +18,23 @@ namespace BJR_bot.Modules
             _lolService = lolService;
         }
 
-        // Get info on a user, or the user who invoked the command if one is not specified
         [Command("dispo")]
         public async Task DispoAsync(string game)
         {
-            _lolService.AddUser(game, Context.User);
-            await ReplyAsync($"Merci {Context.User.Mention}, j'ai noté que tu es dispo pour jouer à **{game}** pour 1h");
+            await DispoAsync(game, TimeSpan.FromHours(1));
+        }
+
+        [Command("dispo")]
+        public async Task DispoAsync(string game, TimeSpan timespan)
+        {
+            if (timespan > TimeSpan.FromHours(12))
+            {
+                await ReplyAsync(
+                    $"Désolé {Context.User.Mention}, tu ne peux pas être dispo pendant plus de 12h de suite :)");
+                return;
+            }
+            _lolService.AddUser(game, Context.User, timespan);
+            await ReplyAsync($"Merci {Context.User.Mention}, j'ai noté que tu es dispo pour jouer à **{game}** pour {timespan:h'h 'm'm 's's'}");
         }
 
         [Command("plusdispo")]
@@ -66,7 +77,7 @@ namespace BJR_bot.Modules
                 foreach (var dispoUser in dispoUsers)
                 {
                     embed.AddField(dispoUser.Key.Username,
-                        $"Encore {(int) (dispoUser.Value - DateTimeOffset.UtcNow).TotalMinutes} min");
+                        $"Encore {dispoUser.Value - DateTimeOffset.UtcNow:h'h 'm'm 's's'}");
                 }
             }
 
@@ -76,12 +87,11 @@ namespace BJR_bot.Modules
         [Command("ping")]
         public async Task PingAsync(string game)
         {
-            _lolService.AddUser(game, Context.User);
             Dictionary<IUser, DateTimeOffset> dispoUsers = _lolService.GetUsers(game);
             StringBuilder message = new StringBuilder($"Ping pour jouer à **{game}**\n");
             foreach (var dispoUser in dispoUsers)
             {
-                message.Append($"{dispoUser.Key.Mention}\tEncore {(int)(dispoUser.Value - DateTimeOffset.UtcNow).TotalMinutes}min\n");
+                message.Append($"{dispoUser.Key.Mention}\tEncore {dispoUser.Value - DateTimeOffset.UtcNow:h'h 'm'm 's's'}\n");
             }
             await ReplyAsync(message.ToString());
         }
