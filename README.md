@@ -1,1 +1,1 @@
-TODO
+[![Build Status](https://dev.azure.com/ryzum-visualstudioenterprise/MyProject/_apis/build/status/discord-bjr-bot%20-%201%20-%20CI?branchName=master)](https://dev.azure.com/ryzum-visualstudioenterprise/MyProject/_build/latest?definitionId=2&branchName=master)
