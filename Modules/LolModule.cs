@@ -70,7 +70,7 @@ namespace BJR_bot.Modules
             {
                 embed = new EmbedBuilder
                 {
-                    Description = $"Voici la liste des personnes disponibles pour jouer à **{game}**\n", 
+                    Description = $"Voici la liste des personnes disponibles pour jouer à **{game}** : \n", 
                     Color = Color.Blue
                 };
                 var message = new StringBuilder();
