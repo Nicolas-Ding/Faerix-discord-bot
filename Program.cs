@@ -26,23 +26,24 @@ namespace BJR_bot
         {
             var token = await GetTokenAsync();
 
-            var services = ConfigureServices();
-            _client = services.GetRequiredService<DiscordSocketClient>();
+            using (var services = ConfigureServices())
+            {
+                _client = services.GetRequiredService<DiscordSocketClient>();
 
-            _client.Log += LogAsync;
-            services.GetRequiredService<CommandService>().Log += LogAsync;
+                _client.Log += LogAsync;
+                services.GetRequiredService<CommandService>().Log += LogAsync;
 
-            _client.Ready += ReadyAsync;
+                _client.Ready += ReadyAsync;
 
-            await _client.LoginAsync(TokenType.Bot, token);
-            await _client.StartAsync();
+                await _client.LoginAsync(TokenType.Bot, token);
+                await _client.StartAsync();
 
-            // Here we initialize the logic required to register our commands.
-            await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+                // Here we initialize the logic required to register our commands.
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
-            // Block the program until it is closed.
-            await Task.Delay(-1);
-            services.Dispose();
+                // Block the program until it is closed.
+                await Task.Delay(-1);
+            }
         }
 
         private async Task<string> GetTokenAsync()
