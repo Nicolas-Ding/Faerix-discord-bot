@@ -17,12 +17,14 @@ namespace BJR_bot.Services
 
         public Dictionary<IUser, DateTimeOffset> GetUsers(string game)
         {
+            game = game.ToLower();
             CleanList();
             return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new Dictionary<IUser, DateTimeOffset>();
         }
 
         public void AddUser(string game, IUser user, TimeSpan availableTime)
         {
+            game = game.ToLower();
             if (!usersLookingForGame.ContainsKey(game))
             {
                 usersLookingForGame[game] = new Dictionary<IUser, DateTimeOffset>();
@@ -33,6 +35,7 @@ namespace BJR_bot.Services
 
         public void RemoveUser(string game, IUser user)
         {
+            game = game.ToLower();
             usersLookingForGame[game].Remove(user);
         }
 
