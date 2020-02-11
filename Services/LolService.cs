@@ -8,29 +8,38 @@ namespace BJR_bot.Services
 {
     public class LolService
     {
-        private Dictionary<string, Dictionary<IUser, DateTimeOffset>> usersLookingForGame; 
+        private Dictionary<string, Dictionary<IUser, DispoData>> usersLookingForGame; 
  
         public LolService()
         {
-            usersLookingForGame = new Dictionary<string, Dictionary<IUser, DateTimeOffset>>();
+            usersLookingForGame = new Dictionary<string, Dictionary<IUser, DispoData>>();
         }
 
-        public Dictionary<IUser, DateTimeOffset> GetUsers(string game)
+        public Dictionary<IUser, DispoData> GetUsers(string game)
         {
             game = game.ToLower();
             CleanList();
-            return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new Dictionary<IUser, DateTimeOffset>();
+            return usersLookingForGame.ContainsKey(game) ? usersLookingForGame[game] : new Dictionary<IUser, DispoData>();
         }
 
         public void AddUser(string game, IUser user, TimeSpan availableTime)
         {
+            AddUser(game, user, availableTime, DateTimeOffset.UtcNow);
+        }
+
+        public void AddUser(string game, IUser user, TimeSpan availableTime, DateTimeOffset startTime)
+        {
             game = game.ToLower();
             if (!usersLookingForGame.ContainsKey(game))
             {
-                usersLookingForGame[game] = new Dictionary<IUser, DateTimeOffset>();
+                usersLookingForGame[game] = new Dictionary<IUser, DispoData>();
             }
 
-            usersLookingForGame[game][user] = DateTimeOffset.UtcNow.Add(availableTime);
+            usersLookingForGame[game][user] = new DispoData
+            {
+                StartTime = startTime, 
+                EndTime = startTime.Add(availableTime)
+            };
         }
 
         public void RemoveUser(string game, IUser user)
@@ -57,7 +66,7 @@ namespace BJR_bot.Services
             foreach (string game in keys)
             {
                 usersLookingForGame[game] = usersLookingForGame[game]
-                    .Where(_ => _.Value > DateTimeOffset.UtcNow)
+                    .Where(_ => _.Value.EndTime > DateTimeOffset.UtcNow)
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
             }
         }

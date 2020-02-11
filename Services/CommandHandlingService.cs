@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using BJR_bot.TypeReaders;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -29,6 +30,8 @@ namespace BJR_bot.Services
 
         public async Task InitializeAsync()
         {
+            _commands.AddTypeReader(typeof(InKeywordType), new InKeywordTypereader());
+
             // Register modules that are public and inherit ModuleBase<T>.
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
